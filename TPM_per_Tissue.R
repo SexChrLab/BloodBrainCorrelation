@@ -4,33 +4,33 @@
 setwd("/Users/austinevanovich/Documents/GTEx_Blood_Brain")
 
 #Read in data
-cortex <- read.table("Cortex_Counts.tsv", header = T)
+cortex <- read.table("Cortex_counts.tsv", header = T)
 
-substantia <- read.table("SubstantiaNigra_Counts.tsv", header = T)
+substantia <- read.table("Substantia_counts.tsv", header = T)
 
-spinalcord <- read.table("SpinalCord_Counts.tsv", header = T)
+spinalcord <- read.table("SpinalCord_counts.tsv", header = T)
 
-putamen <- read.table("PutamenBasalGanglia_Counts.tsv", header = T)
+putamen <- read.table("Putamen_counts.tsv", header = T)
 
-nucleus <- read.table("NucleusAccumbensBasalGanglia_Counts.tsv", header = T)
+nucleus <- read.table("Nucleus_counts.tsv", header = T)
 
-hypothalamus <- read.table("Hypothalamus_Counts.tsv", header = T)
+hypothalamus <- read.table("Hypothalamus_counts.tsv", header = T)
 
-hippocampus <- read.table("Hippocampus_Counts.tsv", header = T)
+hippocampus <- read.table("Hippocampus_counts.tsv", header = T)
 
-frontalcortex <- read.table("FrontalCortex_Counts.tsv", header = T)
+frontalcortex <- read.table("FrontalCortex_counts.tsv", header = T)
 
-cerebellum <- read.table("Cerebellum_Counts.tsv", header = T)
+cerebellum <- read.table("Cerebellum_counts.tsv", header = T)
 
-cerebellarhemisphere <- read.table("CerebellarHemisphere_Counts.tsv", header = T)
+cerebellarhemisphere <- read.table("CerebellarHemisphere_counts.tsv", header = T)
 
-caudate <- read.table("CaudateBasalGanglia_Counts.tsv", header = T)
+caudate <- read.table("Caudate_counts.tsv", header = T)
 
-anterior <- read.table("AnteriorCingulateCortex_Counts.tsv", header = T)
+anterior <- read.table("Anterior_counts.tsv", header = T)
 
-amygdala <- read.table("Amygdala_Counts.tsv", header = T)
+amygdala <- read.table("Amygdala_counts.tsv", header = T)
 
-wholeblood <- read.table("WholeBlood_Counts.tsv", header = T)
+wholeblood <- read.table("WholeBlood_counts.tsv", header = T)
 
 #read in data for the blood samples that correspond to their respective brain sample
 blood_cortex <- read.table("Blood_Cortex_counts.tsv", header = T)
@@ -67,8 +67,9 @@ library(dplyr)
 protein_ids <- read.csv("mart_export.txt", header = T)
 
 colnames(protein_ids)
+
 ########################
-#Subsetting each count object to just the protein-coding genes by their ensembl gene ID: http://www.ensembl.org/biomart/martview/58e679a255c6e23f443459a2779f080e
+#Subsetting each count object to just the protein-coding genes by their ensembl gene ID: http://www.ensembl.org/biomart/martview/58e679a255c6e23f443473a2779f080e
 ########################
 cortex_protein <- subset(cortex, cortex$Name %in% protein_ids$Gene.stable.ID.version)
 
@@ -132,55 +133,244 @@ blood_amygdala_protein <- subset(blood_amygdala, blood_amygdala$Name %in% protei
 #then, based on the selected object, only keep rows with specific values
 
 ####TPM >1
-brain2 <- cortex_protein[,-1]
+brain2 <- wholeblood[,-1]
 brain3 <- brain2[,-1]  #Use this value to determine number of patients in the brain tissue
 
-blood2 <- blood_cortex_protein[,-1]
+blood2 <- blood_hippocampus[,-1]
 blood3 <- blood2[,-1] #and this to determine number of patients in the brain-blood samples
 
-blood_cortex_protein$bl_count_1 <- rowSums(blood3 >= 1)
-blood_cortex_1 <- which(blood_cortex_protein$bl_count_1 >= 210)
+#blood3 <- blood3[, -69]
+#colnames(blood3)
 
-cortex_protein$su_count_1 <- rowSums(brain3 >= 1)
-cortex_1 <- which(cortex_protein$su_count_1 >= 215)
-#View(blood_cortex_1)
+blood_hippocampus$bl_count_1 <- rowSums(blood3 >= 1)
+blood_hippocampus_1 <- which(blood_hippocampus$bl_count_1 >= 73)
 
-blood_cortex_merged <- merge(blood_cortex_protein, cortex_protein, by = "Name")
-blsu_count1 <- select(blood_cortex_merged, bl_count_1, su_count_1)
+wholeblood$su_count_1 <- rowSums(brain3 >= 1)
+wholeblood <- which(wholeblood$su_count_1 >= 73)
+#View(blood_hippocampus_1)
+
+blood_hippocampus_merged <- merge(blood_hippocampus, hippocampus, by = "Name")
+blsu_count1 <- select(blood_hippocampus_merged, bl_count_1, su_count_1)
 #View(blco_count1)
 
-tpm1 <- blsu_count1[blsu_count1$bl_count_1 == 210 & blsu_count1$su_count_1 == 215,][,1:2]
-tpm1 <- blsu_count1[blsu_count1$bl_count_1 == 210 & blsu_count1$su_count_1 < 215,][,1:2]
-tpm1 <- blsu_count1[blsu_count1$bl_count_1 < 210 & blsu_count1$su_count_1 == 215,][,1:2]
+tpm1 <- blsu_count1[blsu_count1$bl_count_1 == 73 & blsu_count1$su_count_1 == 73,][,1:2]
+tpm1 <- blsu_count1[blsu_count1$bl_count_1 == 73 & blsu_count1$su_count_1 < 73,][,1:2]
+tpm1 <- blsu_count1[blsu_count1$bl_count_1 < 73 & blsu_count1$su_count_1 == 73,][,1:2]
+tpm1 <- blsu_count1[blsu_count1$bl_count_1 < 73 & blsu_count1$su_count_1 < 73,][,1:2]
 #View(bcor2)
 
 ####For TPM >5
-blood_cortex_protein$bl_count_5 <- rowSums(blood3 >= 5)
-blood_cortex_5 <- which(blood_cortex_protein$bl_count_5 >= 210)
+blood_hippocampus$bl_count_5 <- rowSums(blood3 >= 5)
+blood_hippocampus_5 <- which(blood_hippocampus$bl_count_5 >= 73)
 
-cortex_protein$su_count_5 <- rowSums(brain3 >= 5)
-cortex_5 <- which(cortex_protein$su_count_5 >= 215)
+wholeblood$su_count_5 <- rowSums(brain3 >= 5)
+wholeblood_5 <- which(wholeblood$su_count_5 >= 73)
 
-blood_cortex_merged <- merge(blood_cortex_protein, cortex_protein, by = "Name")
-blsu_count5 <- select(blood_cortex_merged, bl_count_5, su_count_5)
+blood_hippocampus_merged <- merge(blood_hippocampus, hippocampus, by = "Name")
+blsu_count5 <- select(blood_hippocampus_merged, bl_count_5, su_count_5)
 #View(blco_count1)
 
-tpm5 <- blsu_count5[blsu_count5$bl_count_5 == 210 & blsu_count5$su_count_5 == 215,][,1:2]
-tpm5 <- blsu_count5[blsu_count5$bl_count_5 == 210 & blsu_count5$su_count_5 < 215,][,1:2]
-tpm5 <- blsu_count5[blsu_count5$bl_count_5 < 210 & blsu_count5$su_count_5 == 215,][,1:2]
+tpm5 <- blsu_count5[blsu_count5$bl_count_5 == 73 & blsu_count5$su_count_5 == 73,][,1:2]
+tpm5 <- blsu_count5[blsu_count5$bl_count_5 == 73 & blsu_count5$su_count_5 < 73,][,1:2]
+tpm5 <- blsu_count5[blsu_count5$bl_count_5 < 73 & blsu_count5$su_count_5 == 73,][,1:2]
+tpm5 <- blsu_count5[blsu_count5$bl_count_5 < 93 & blsu_count5$su_count_5 < 93,][,1:2]
 
 ###For TPM >10
-blood_cortex_protein$bl_count_10 <- rowSums(blood3 >= 10)
-blood_cortex_10 <- which(blood_cortex_protein$bl_count_10 >= 210)
+blood_hippocampus$bl_count_10 <- rowSums(blood3 >= 10)
+blood_hippocampus_10 <- which(blood_hippocampus$bl_count_10 >= 73)
 
-cortex_protein$su_count_10 <- rowSums(brain3 >= 10)
-cortex_10 <- which(cortex_protein$su_count_10 >= 215)
-#View(blood_cortex_1)
+wholeblood$su_count_10 <- rowSums(brain3 >= 10)
+wholeblood_10 <- which(wholeblood$su_count_10 >= 73)
+#View(blood_hippocampus_1)
 
-blood_cortex_merged <- merge(blood_cortex_protein, cortex_protein, by = "Name")
-blsu_count10 <- select(blood_cortex_merged, bl_count_10, su_count_10)
-#View(blco_count1)
+blood_hippocampus_merged <- merge(blood_hippocampus, hippocampus, by = "Name")
+blsu_count10 <- select(blood_hippocampus_merged, bl_count_10, su_count_10)
+#View(blood_cortex_merged)
+#View(cortex_10)
 
-tpm10 <- blsu_count10[blsu_count10$bl_count_10 == 210 & blsu_count10$su_count_10 == 215,][,1:2]
-tpm10 <- blsu_count10[blsu_count10$bl_count_10 == 210 & blsu_count10$su_count_10 < 215,][,1:2]
-tpm10 <- blsu_count10[blsu_count10$bl_count_10 < 210 & blsu_count10$su_count_10 == 215,][,1:2]
+tpm10 <- blsu_count10[blsu_count10$bl_count_10 == 73 & blsu_count10$su_count_10 == 73,][,1:2]
+tpm10 <- blsu_count10[blsu_count10$bl_count_10 == 73 & blsu_count10$su_count_10 < 73,][,1:2]
+tpm10 <- blsu_count10[blsu_count10$bl_count_10 < 73 & blsu_count10$su_count_10 == 73,][,1:2]
+tpm10 <- blsu_count10[blsu_count10$bl_count_10 < 73 & blsu_count10$su_count_10 < 73,][,1:2]
+
+#get the names of genes that are present in both, just brain, just blood, or neither
+amygdala_genes_1 <- select(blood_amygdala_merged, Description.x, su_count_1, bl_count_1)
+amygdala_genes_1_both <- subset(amygdala_genes_1, su_count_1 >= 59 & bl_count_1 >= 59)
+amygdala_genes_1_blood <- subset(amygdala_genes_1, su_count_1 < 59 & bl_count_1 >= 59)
+amygdala_genes_1_brain <- subset(amygdala_genes_1, su_count_1 >= 59 & bl_count_1 < 59)
+amygdala_genes_1_neither <- subset(amygdala_genes_1, su_count_1 < 59 & bl_count_1 < 59)
+
+View(amygdala_genes_1_both)
+
+CD4 <- subset(blood_amygdala_merged, blood_amygdala_merged$Description.x == "CD4")
+
+APOE_amyg <- subset(amygdala, amygdala$Description == "APOE")
+APOE_blood <- subset(blood_amygdala, blood_amygdala$Description == "APOE")
+
+CD4_amyg <- subset(amygdala, amygdala$Description == "CD4")
+CD4_blood <- subset(blood_amygdala, blood_amygdala$Description == "CD4")
+
+RPS20_amyg <- subset(amygdala, amygdala$Description == "RPS")
+RPS20_blood <- subset(blood_amygdala, blood_amygdala$Description == "CD4")
+
+#apoe2 <- subset(cortex_protein, cortex_protein$Description == "APOE")
+geneselect <- function(DF, COL, GENE){
+  results <- subset(DF, DF[[COL]] == GENE)
+  return(results)
+}
+
+chooseRow <- function(DF, COL, VAL){
+  results <- DF[DF$COL == VAL, ]
+  return(results)
+}
+
+test2 <- amygdala[amygdala$su_count_1 == 59, ]
+test2_b <- blood_amygdala[blood_amygdala$bl_count_1 == 59, ]
+test3 <- chooseRow(DF = amygdala, COL = su_count_1, VAL = 59)
+
+amygdala$su_count_1
+
+#test <- geneselect(DF = blood_amygdala_merged, COL = "Description.x", GENE = "CNBD1")
+
+APOE_anterior <- geneselect(DF = anterior, COL = "Description", GENE = "APOE")
+APOE_blood <- geneselect(DF = blood_anterior, COL = "Description", GENE = "APOE")
+
+CD4_anterior <- geneselect(DF = anterior, COL = "Description", GENE = "CD4")
+CD4_blood <- geneselect(DF = blood_anterior, COL = "Description", GENE = "CD4")
+
+RPS20_anterior <- geneselect(DF = anterior, COL = "Description", GENE = "RPS20")
+RPS20_blood <- geneselect(DF = blood_anterior, COL = "Description", GENE = "RPS20")
+
+
+#View(CD4)
+#View(test)
+#View(apoe2)
+
+#col.names.remove <- c("su_count_1", "su_count_5","su_count_10", "Name", #"Description")
+#
+#col.names.remove.bl <- c("bl_count_1", "bl_count_5","bl_count_10", "Name", #"Description")
+#
+#RPS20_blood <- RPS20_blood[,!(colnames(RPS20_blood) %in% col.names.remove.bl)]
+
+
+#start to fit a linear model for TPM levels
+
+Drop_Cols <- function(DF, COL){
+  res <- DF[, -COL]
+  return(res)
+}
+
+t1 <- colnames(amygdala)
+test <- amygdala[, -which(t1 %in% c("Name", "Description", "su_count_1", "su_count_5", "su_count_10"))]
+
+colnames(test)
+
+drop_brain_APOE <- Drop_Cols(DF = APOE_anterior, COL = c(1,2,71,72,73))
+drop_blood_APOE <- Drop_Cols(DF = APOE_blood, COL = c(1,2,71,72,73))
+
+drop_brain_CD4 <- Drop_Cols(DF = CD4_anterior, COL = c(1,2,71,72,73))
+drop_blood_CD4 <- Drop_Cols(DF = CD4_blood, COL = c(1,2,71,72,73))
+
+drop_brain_RPS20 <- Drop_Cols(DF = RPS20_anterior, COL = c(1,2,71,72,73))
+drop_blood_RPS20 <- Drop_Cols(DF = RPS20_blood, COL = c(1,2,71,72,73))
+
+
+transpose <- function(DF, COL){
+  res <- as.data.frame(t(DF))
+  colnames(res) = c(COL)
+  return(res)
+}
+
+APOE_brain_turn <- transpose(DF = drop_brain_APOE, COL = "TPM")
+APOE_blood_turn <- transpose(DF = drop_blood_APOE, COL = "TPM")
+
+CD4_brain_turn <- transpose(DF = drop_brain_CD4, COL = "TPM")
+CD4_blood_turn <- transpose(DF = drop_blood_CD4, COL = "TPM")
+
+RPS20_brain_turn <- transpose(DF = drop_brain_RPS20, COL = "TPM")
+RPS20_blood_turn <- transpose(DF = drop_blood_RPS20, COL = "TPM")
+
+#View(CD4_blood_turn)
+
+
+#APOE_model <- lm(APOE_at$`48985` ~ APOE_bt$`23729`)
+APOE_model <- lm(APOE_brain_turn$TPM ~ APOE_blood_turn$TPM)
+summary(APOE_model)
+
+
+plot(APOE_blood_turn$TPM, APOE_brain_turn$TPM,  xlab = "TPM in Blood", ylab = "TPM in anterior", pch = c(16), col = c("blue"), main = "APOE")
+abline(APOE_model)
+
+#================================
+
+CD4_model <- lm(CD4_brain_turn$TPM ~ CD4_blood_turn$TPM)
+summary(CD4_model)
+
+
+plot(CD4_blood_turn$TPM, CD4_brain_turn$TPM,  xlab = "TPM in Blood", ylab = "TPM in anterior", pch = c(16), col = c("blue"), main = "CD4")
+abline(CD4_model)
+
+#================================
+
+RPS20_model <- lm(RPS20_brain_turn$TPM ~ RPS20_blood_turn$TPM)
+summary(RPS20_model)
+
+
+plot(RPS20_blood_turn$TPM, RPS20_brain_turn$TPM, xlab = "TPM in Blood", ylab = "TPM in anterior", pch = c(16), col = c("blue"), main = "RPS20")
+abline(RPS20_model)
+
+#legend("topright", legend = c("Amygdala", "Blood"), col = c("blue", "red"),
+#pch = c(16,18))
+plot(amygdala_model)
+
+amygdala_model_CD4 <- lm(CD4_at$`32653` ~ CD4_bt$`32653`)
+summary(amygdala_model_rps20)
+
+plot(RPS20_bt$`23729`, RPS20_at$`23729`, xlab = "TPM in Blood", ylab = "TPM in Amygdala", pch = c(16), col = c("blue"), main = "RPS20")
+#legend("topright", legend = c("Amygdala"), col = c("blue"),
+      # pch = c(16))
+abline(amygdala_model_rps20)
+#test <- amygdala_protein %>% filter(
+#  Description == "RPS20")
+
+APOE_amyg <- APOE_amyg[, -1]
+View(APOE_amyg)
+APOE_at <- as.data.frame(t(APOE_amyg), colnames = c("ID", "TPM"))
+
+APOE_blood <- APOE_blood[, -1]
+APOE_bt <- as.data.frame(t(APOE_blood), colnames = c("ID", "TPM"))
+View(APOE_at)
+write.table(RPS20bl, file = "blood_amygdala_rps20.csv", sep = ",")
+
+RPS20f <- cbind(RPS20bl, RPS20t)
+
+RPS20t <- as.matrix(RPS20t)
+colnames(RPS20t) <- c( "TPM")
+RPS20bl <- RPS20bl[-1, ]
+View(RPS20t)
+
+colnames(RPS20f) <- c("TPM", "ID")
+
+library(stringr)
+library(broom)
+
+RPS20blood <- RPS20bl[-c(1,2),]
+RPS20amyg <- RPS20t[-c(1,2),]
+colnames(RPS20amyg) <- c("test","second")
+View(RPS20amyg)
+RPS20_model <- merge(RPS20blood, RPS20amyg)
+
+row.names.remove <- c("su_count_1", "su_count_5","su_count_10")
+
+RPS20amyg <- RPS20amyg[!(row.names(RPS20amyg) %in% row.names.remove), ]
+
+library(tidyverse)
+
+RPS20amyg <- RPS20amyg[grepl('GTEX', RPS20amyg),]
+
+RPS20amyg <- data.frame(stringsAsFactors = FALSE,
+                            EA = c("Los Angeles, CA", "Other text")
+)
+
+large_dataset %>% 
+  filter(str_detect(EA, pattern = "CA"))
