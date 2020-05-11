@@ -64,6 +64,7 @@ Testing for correlations between expression in the blood and brain
     Number of columns of tissue 1 after subsetting for shared samples is  162
     Number of columns of tissue 2 after subsetting for shared samples is  162
     ```
+    
       - So you know that the number of shared samples match. 
       
  ### 3. Subset genes with certain tpm threshold
