@@ -5,7 +5,6 @@
 ## Purpose of script:
 ## 1) Perform linear regression analysis after filtering for TPM
 ##  - All genes
-##  - Candidate genes
 ## 
 ## 2) Perform multiple linear regression
 ##  - Sex info located at 3rd last column of sad_merged_genes_TPM
@@ -20,17 +19,11 @@
 ##
 ## Note: 
 ## 1) Currently, working directory needs to be changed manually to include multiple TPMs
-## 2) This script uses for loops
+## 2) To allow outputs with other TPMs, change directory and TPM values where necessary
+## 3) This script uses for loops
 ## -----------------
 
 #####
-## The following outputs genes with TPM >= 10 only
-## Note that TPM >= 10 is used here instead of TPM >= 1
-## This is because there are less genes with TPM >= 10, 
-## To allow outputs with other TPMs, change directory and TPM values where necessary
-
-## Read files from existing matched tissue
-
 ## Set working directory
 ## Working directory should include the documents listed above
 working_dir <- "/Users/Sloth/Downloads/SexChrLab/BloodBrain/OutputFile/matched_sad_tissue/all_genes/all_samples/gene_list_1/both_tpm_1"
